@@ -1,20 +1,3 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""This file contains code to build and run the tensorflow graph for the sequence-to-sequence model"""
 
 import os
 import time
@@ -54,12 +37,7 @@ class SummarizationModel(object):
 
 
   def _make_feed_dict(self, batch, just_enc=False):
-    """Make a feed dictionary mapping parts of the batch to the appropriate placeholders.
 
-    Args:
-      batch: Batch object
-      just_enc: Boolean. If True, only feed the parts needed for the encoder.
-    """
     feed_dict = {}
     feed_dict[self._enc_batch] = batch.enc_batch
     feed_dict[self._enc_lens] = batch.enc_lens
@@ -74,18 +52,7 @@ class SummarizationModel(object):
     return feed_dict
 
   def _add_encoder(self, encoder_inputs, seq_len):
-    """Add a single-layer bidirectional LSTM encoder to the graph.
 
-    Args:
-      encoder_inputs: A tensor of shape [batch_size, <=max_enc_steps, emb_size].
-      seq_len: Lengths of encoder_inputs (before padding). A tensor of shape [batch_size].
-
-    Returns:
-      encoder_outputs:
-        A tensor of shape [batch_size, <=max_enc_steps, 2*hidden_dim]. It's 2*hidden_dim because it's the concatenation of the forwards and backwards states.
-      fw_state, bw_state:
-        Each are LSTMStateTuples of shape ([batch_size,hidden_dim],[batch_size,hidden_dim])
-    """
     with tf.variable_scope('encoder'):
       cell_fw = tf.contrib.rnn.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
       cell_bw = tf.contrib.rnn.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
@@ -95,15 +62,7 @@ class SummarizationModel(object):
 
 
   def _reduce_states(self, fw_st, bw_st):
-    """Add to the graph a linear layer to reduce the encoder's final FW and BW state into a single initial state for the decoder. This is needed because the encoder is bidirectional but the decoder is not.
 
-    Args:
-      fw_st: LSTMStateTuple with hidden_dim units.
-      bw_st: LSTMStateTuple with hidden_dim units.
-
-    Returns:
-      state: LSTMStateTuple with hidden_dim units.
-    """
     hidden_dim = self._hps.hidden_dim
     with tf.variable_scope('reduce_final_st'):
 
@@ -122,18 +81,7 @@ class SummarizationModel(object):
 
 
   def _add_decoder(self, inputs):
-    """Add attention decoder to the graph. In train or eval mode, you call this once to get output on ALL steps. In decode (beam search) mode, you call this once for EACH decoder step.
 
-    Args:
-      inputs: inputs to the decoder (word embeddings). A list of tensors shape (batch_size, emb_dim)
-
-    Returns:
-      outputs: List of tensors; the outputs of the decoder
-      out_state: The final state of the decoder
-      attn_dists: A list of tensors; the attention distributions
-      p_gens: A list of scalar tensors; the generation probabilities
-      coverage: A tensor, the current coverage vector
-    """
     hps = self._hps
     cell = tf.contrib.rnn.LSTMCell(hps.hidden_dim, state_is_tuple=True, initializer=self.rand_unif_init)
 
@@ -144,15 +92,7 @@ class SummarizationModel(object):
     return outputs, out_state, attn_dists, p_gens, coverage
 
   def _calc_final_dist(self, vocab_dists, attn_dists):
-    """Calculate the final distribution, for the pointer-generator model
 
-    Args:
-      vocab_dists: The vocabulary distributions. List length max_dec_steps of (batch_size, vsize) arrays. The words are in the order they appear in the vocabulary file.
-      attn_dists: The attention distributions. List length max_dec_steps of (batch_size, attn_len) arrays
-
-    Returns:
-      final_dists: The final distributions. List length max_dec_steps of (batch_size, extended_vsize) arrays.
-    """
     with tf.variable_scope('final_distribution'):
       # Multiply vocab dists by p_gen and attention dists by (1-p_gen)
       vocab_dists = [p_gen * dist for (p_gen,dist) in zip(self.p_gens, vocab_dists)]
@@ -183,9 +123,7 @@ class SummarizationModel(object):
       return final_dists
 
   def _add_emb_vis(self, embedding_var):
-    """Do setup so that we can view word embedding visualization in Tensorboard, as described here:
-    https://www.tensorflow.org/get_started/embedding_viz
-    Make the vocab metadata file, then make the projector config file pointing to it."""
+
     train_dir = os.path.join(FLAGS.log_root, "train")
     vocab_metadata_path = os.path.join(train_dir, "vocab_metadata.tsv")
     self._vocab.write_metadata(vocab_metadata_path) # write metadata file
@@ -345,16 +283,7 @@ class SummarizationModel(object):
     return sess.run(to_return, feed_dict)
 
   def run_encoder(self, sess, batch):
-    """For beam search decoding. Run the encoder on the batch and return the encoder states and decoder initial state.
 
-    Args:
-      sess: Tensorflow session.
-      batch: Batch object that is the same example repeated across the batch (for beam search)
-
-    Returns:
-      enc_states: The encoder states. A tensor of shape [batch_size, <=max_enc_steps, 2*hidden_dim].
-      dec_in_state: A LSTMStateTuple of shape ([1,hidden_dim],[1,hidden_dim])
-    """
     feed_dict = self._make_feed_dict(batch, just_enc=True) # feed the batch into the placeholders
     (enc_states, dec_in_state, global_step) = sess.run([self._enc_states, self._dec_in_state, self.global_step], feed_dict) # run the encoder
 
@@ -365,25 +294,7 @@ class SummarizationModel(object):
 
 
   def decode_onestep(self, sess, batch, latest_tokens, enc_states, dec_init_states, prev_coverage):
-    """For beam search decoding. Run the decoder for one step.
 
-    Args:
-      sess: Tensorflow session.
-      batch: Batch object containing single example repeated across the batch
-      latest_tokens: Tokens to be fed as input into the decoder for this timestep
-      enc_states: The encoder states.
-      dec_init_states: List of beam_size LSTMStateTuples; the decoder states from the previous timestep
-      prev_coverage: List of np arrays. The coverage vectors from the previous timestep. List of None if not using coverage.
-
-    Returns:
-      ids: top 2k ids. shape [beam_size, 2*beam_size]
-      probs: top 2k log probabilities. shape [beam_size, 2*beam_size]
-      new_states: new states of the decoder. a list length beam_size containing
-        LSTMStateTuples each of shape ([hidden_dim,],[hidden_dim,])
-      attn_dists: List length beam_size containing lists length attn_length.
-      p_gens: Generation probabilities for this step. A list length beam_size. List of None if in baseline mode.
-      new_coverage: Coverage vectors for this step. A list of arrays. List of None if coverage is not turned on.
-    """
 
     beam_size = len(dec_init_states)
 
@@ -444,15 +355,7 @@ class SummarizationModel(object):
 
 
 def _mask_and_avg(values, padding_mask):
-  """Applies mask to values then returns overall average (a scalar)
 
-  Args:
-    values: a list length max_dec_steps containing arrays shape (batch_size).
-    padding_mask: tensor shape (batch_size, max_dec_steps) containing 1s and 0s.
-
-  Returns:
-    a scalar
-  """
 
   dec_lens = tf.reduce_sum(padding_mask, axis=1) # shape batch_size. float32
   values_per_step = [v * padding_mask[:,dec_step] for dec_step,v in enumerate(values)]
@@ -461,15 +364,7 @@ def _mask_and_avg(values, padding_mask):
 
 
 def _coverage_loss(attn_dists, padding_mask):
-  """Calculates the coverage loss from the attention distributions.
-
-  Args:
-    attn_dists: The attention distributions for each decoder timestep. A list length max_dec_steps containing shape (batch_size, attn_length)
-    padding_mask: shape (batch_size, max_dec_steps).
-
-  Returns:
-    coverage_loss: scalar
-  """
+ 
   coverage = tf.zeros_like(attn_dists[0]) # shape (batch_size, attn_length). Initial coverage is zero.
   covlosses = [] # Coverage loss per decoder timestep. Will be list length max_dec_steps containing shape (batch_size).
   for a in attn_dists:

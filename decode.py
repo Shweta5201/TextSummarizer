@@ -1,20 +1,3 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""This file contains code to run beam search decoding, including running ROUGE evaluation and producing JSON datafiles for the in-browser attention visualizer, which can be found here https://github.com/abisee/attn_vis"""
 
 import os
 import time
@@ -33,16 +16,10 @@ SECS_UNTIL_NEW_CKPT = 60  # max number of seconds before loading new checkpoint
 
 
 class BeamSearchDecoder(object):
-  """Beam search decoder."""
+
 
   def __init__(self, model, batcher, vocab):
-    """Initialize decoder.
 
-    Args:
-      model: a Seq2SeqAttentionModel object.
-      batcher: a Batcher object.
-      vocab: Vocabulary object
-    """
     self._model = model
     self._model.build_graph()
     self._batcher = batcher
@@ -75,7 +52,7 @@ class BeamSearchDecoder(object):
 
 
   def decode(self):
-    """Decode examples until data is exhausted (if FLAGS.single_pass) and return, or decode indefinitely, loading latest checkpoint at regular intervals"""
+
     t0 = time.time()
     counter = 0
     while True:
@@ -125,13 +102,7 @@ class BeamSearchDecoder(object):
           t0 = time.time()
 
   def write_for_rouge(self, reference_sents, decoded_words, ex_index):
-    """Write output to file in correct format for eval with pyrouge. This is called in single_pass mode.
 
-    Args:
-      reference_sents: list of strings
-      decoded_words: list of strings
-      ex_index: int, the index with which to label the files
-    """
     # First, divide decoded output into sentences
     decoded_sents = []
     while len(decoded_words) > 0:
@@ -163,16 +134,7 @@ class BeamSearchDecoder(object):
 
 
   def write_for_attnvis(self, article, abstract, decoded_words, attn_dists, p_gens):
-    """Write some data to json file, which can be read into the in-browser attention visualizer tool:
-      https://github.com/abisee/attn_vis
 
-    Args:
-      article: The original article string.
-      abstract: The human (correct) abstract string.
-      attn_dists: List of arrays; the attention distributions.
-      decoded_words: List of strings; the words of the generated summary.
-      p_gens: List of scalars; the p_gen values. If not running in pointer-generator mode, list of None.
-    """
     article_lst = article.split() # list of words
     decoded_lst = decoded_words # list of decoded words
     to_write = {
@@ -190,11 +152,11 @@ class BeamSearchDecoder(object):
 
 
 def print_results(article, abstract, decoded_output):
-  """Prints the article, the reference summmary and the decoded summary to screen"""
+
   print("---------------------------------------------------------------------------")
   tf.logging.info('ARTICLE:  %s', article)
   tf.logging.info('REFERENCE SUMMARY: %s', abstract)
-  tf.logging.info('GENERATED SUMMARY: %s', decoded_output)
+  tf.logging.info('SENTIENT GENERATED SUMMARY: %s', decoded_output)
   print("---------------------------------------------------------------------------")
 
 
@@ -218,11 +180,7 @@ def rouge_eval(ref_dir, dec_dir):
 
 
 def rouge_log(results_dict, dir_to_write):
-  """Log ROUGE results to screen and write to file.
-
-  Args:
-    results_dict: the dictionary returned by pyrouge
-    dir_to_write: the directory where we will write the results to"""
+ 
   log_str = ""
   for x in ["1","2","l"]:
     log_str += "\nROUGE-%s:\n" % x

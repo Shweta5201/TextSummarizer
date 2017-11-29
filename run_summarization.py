@@ -1,18 +1,4 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
+
 
 """This is the top-level file to train, evaluate or test your summarization model"""
 
@@ -120,7 +106,7 @@ def restore_best_model():
   new_model_name = curr_ckpt.split("/")[-1].replace("bestmodel", "model")
   new_fname = os.path.join(FLAGS.log_root, "train", new_model_name)
   print ("Saving model to %s..." % (new_fname))
-  new_saver = tf.train.Saver() # this saver saves all variables that now exist, including Adagrad variables
+  new_saver = tf.train.Saver()
   new_saver.save(sess, new_fname)
   print ("Saved.")
   exit()

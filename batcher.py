@@ -1,20 +1,6 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
 
-"""This file contains code to process data into batches"""
+
+
 
 import queue as Queue
 from random import shuffle
@@ -26,17 +12,10 @@ import data
 
 
 class Example(object):
-  """Class representing a train/val/test example for text summarization."""
+
 
   def __init__(self, article, abstract_sentences, vocab, hps):
-    """Initializes the Example, performing tokenization and truncation to produce the encoder, decoder and target sequences, which are stored in self.
-
-    Args:
-      article: source text; a string. each token is separated by a single space.
-      abstract_sentences: list of strings, one per abstract sentence. In each sentence, each token is separated by a single space.
-      vocab: Vocabulary object
-      hps: hyperparameters
-    """
+\
     self.hps = hps
 
     # Get ids of special tokens
@@ -77,18 +56,7 @@ class Example(object):
 
 
   def get_dec_inp_targ_seqs(self, sequence, max_len, start_id, stop_id):
-    """Given the reference summary as a sequence of tokens, return the input sequence for the decoder, and the target sequence which we will use to calculate loss. The sequence will be truncated if it is longer than max_len. The input sequence must start with the start_id and the target sequence must end with the stop_id (but not if it's been truncated).
 
-    Args:
-      sequence: List of ids (integers)
-      max_len: integer
-      start_id: integer
-      stop_id: integer
-
-    Returns:
-      inp: sequence length <=max_len starting with start_id
-      target: sequence same length as input, ending with stop_id only if there was no truncation
-    """
     inp = [start_id] + sequence[:]
     target = sequence[:]
     if len(inp) > max_len: # truncate
@@ -101,7 +69,7 @@ class Example(object):
 
 
   def pad_decoder_inp_targ(self, max_len, pad_id):
-    """Pad decoder input and target sequences with pad_id up to max_len."""
+
     while len(self.dec_input) < max_len:
       self.dec_input.append(pad_id)
     while len(self.target) < max_len:
@@ -109,7 +77,7 @@ class Example(object):
 
 
   def pad_encoder_input(self, max_len, pad_id):
-    """Pad the encoder input sequence with pad_id up to max_len."""
+
     while len(self.enc_input) < max_len:
       self.enc_input.append(pad_id)
     if self.hps.pointer_gen:
@@ -118,38 +86,17 @@ class Example(object):
 
 
 class Batch(object):
-  """Class representing a minibatch of train/val/test examples for text summarization."""
+
 
   def __init__(self, example_list, hps, vocab):
-    """Turns the example_list into a Batch object.
 
-    Args:
-       example_list: List of Example objects
-       hps: hyperparameters
-       vocab: Vocabulary object
-    """
     self.pad_id = vocab.word2id(data.PAD_TOKEN) # id of the PAD token used to pad sequences
     self.init_encoder_seq(example_list, hps) # initialize the input to the encoder
     self.init_decoder_seq(example_list, hps) # initialize the input and targets for the decoder
     self.store_orig_strings(example_list) # store the original strings
 
   def init_encoder_seq(self, example_list, hps):
-    """Initializes the following:
-        self.enc_batch:
-          numpy array of shape (batch_size, <=max_enc_steps) containing integer ids (all OOVs represented by UNK id), padded to length of longest sequence in the batch
-        self.enc_lens:
-          numpy array of shape (batch_size) containing integers. The (truncated) length of each encoder input sequence (pre-padding).
-        self.enc_padding_mask:
-          numpy array of shape (batch_size, <=max_enc_steps), containing 1s and 0s. 1s correspond to real tokens in enc_batch and target_batch; 0s correspond to padding.
 
-      If hps.pointer_gen, additionally initializes the following:
-        self.max_art_oovs:
-          maximum number of in-article OOVs in the batch
-        self.art_oovs:
-          list of list of in-article OOVs (strings), for each example in the batch
-        self.enc_batch_extend_vocab:
-          Same as self.enc_batch, but in-article OOVs are represented by their temporary article OOV number.
-    """
     # Determine the maximum length of the encoder input sequence in this batch
     max_enc_seq_len = max([ex.enc_len for ex in example_list])
 
@@ -157,8 +104,7 @@ class Batch(object):
     for ex in example_list:
       ex.pad_encoder_input(max_enc_seq_len, self.pad_id)
 
-    # Initialize the numpy arrays
-    # Note: our enc_batch can have different length (second dimension) for each batch because we use dynamic_rnn for the encoder.
+
     self.enc_batch = np.zeros((hps.batch_size, max_enc_seq_len), dtype=np.int32)
     self.enc_lens = np.zeros((hps.batch_size), dtype=np.int32)
     self.enc_padding_mask = np.zeros((hps.batch_size, max_enc_seq_len), dtype=np.float32)
@@ -182,14 +128,7 @@ class Batch(object):
         self.enc_batch_extend_vocab[i, :] = ex.enc_input_extend_vocab[:]
 
   def init_decoder_seq(self, example_list, hps):
-    """Initializes the following:
-        self.dec_batch:
-          numpy array of shape (batch_size, max_dec_steps), containing integer ids as input for the decoder, padded to max_dec_steps length.
-        self.target_batch:
-          numpy array of shape (batch_size, max_dec_steps), containing integer ids for the target sequence, padded to max_dec_steps length.
-        self.dec_padding_mask:
-          numpy array of shape (batch_size, max_dec_steps), containing 1s and 0s. 1s correspond to real tokens in dec_batch and target_batch; 0s correspond to padding.
-        """
+
     # Pad the inputs and targets
     for ex in example_list:
       ex.pad_decoder_inp_targ(hps.max_dec_steps, self.pad_id)
@@ -215,19 +154,12 @@ class Batch(object):
 
 
 class Batcher(object):
-  """A class to generate minibatches of data. Buckets examples together based on length of the encoder sequence."""
+
 
   BATCH_QUEUE_MAX = 100 # max number of batches the batch_queue can hold
 
   def __init__(self, data_path, vocab, hps, single_pass):
-    """Initialize the batcher. Start threads that process the data into batches.
 
-    Args:
-      data_path: tf.Example filepattern.
-      vocab: Vocabulary object
-      hps: hyperparameters
-      single_pass: If True, run through the dataset exactly once (useful for when you want to run evaluation on the dev or test set). Otherwise generate random batches indefinitely (useful for training).
-    """
     self._data_path = data_path
     self._vocab = vocab
     self._hps = hps
@@ -268,13 +200,7 @@ class Batcher(object):
 
 
   def next_batch(self):
-    """Return a Batch from the batch queue.
 
-    If mode='decode' then each batch contains a single example repeated beam_size-many times; this is necessary for beam search.
-
-    Returns:
-      batch: a Batch object, or None if we're in single_pass mode and we've exhausted the dataset.
-    """
     # If the batch queue is empty, print a warning
     if self._batch_queue.qsize() == 0:
       tf.logging.warning('Bucket input queue is empty when calling next_batch. Bucket queue size: %i, Input queue size: %i', self._batch_queue.qsize(), self._example_queue.qsize())
@@ -286,7 +212,7 @@ class Batcher(object):
     return batch
 
   def fill_example_queue(self):
-    """Reads data from file and processes into Examples which are then placed into the example queue."""
+
 
     input_gen = self.text_generator(data.example_generator(self._data_path, self._single_pass))
 
@@ -308,10 +234,7 @@ class Batcher(object):
 
 
   def fill_batch_queue(self):
-    """Takes Examples out of example queue, sorts them by encoder sequence length, processes into Batches and places them in the batch queue.
 
-    In decode mode, makes batches that each contain a single example repeated.
-    """
     while True:
       if self._hps.mode != 'decode':
         # Get bucketing_cache_size-many batches of Examples into a list, then sort
@@ -336,7 +259,7 @@ class Batcher(object):
 
 
   def watch_threads(self):
-    """Watch example queue and batch queue threads and restart if dead."""
+
     while True:
       time.sleep(60)
       for idx,t in enumerate(self._example_q_threads):
@@ -356,10 +279,7 @@ class Batcher(object):
 
 
   def text_generator(self, example_generator):
-    """Generates article and abstract text from tf.Example.
 
-    Args:
-      example_generator: a generator of tf.Examples from file. See data.example_generator"""
     while True:
       e = next(example_generator) # e is a tf.Example
       try:

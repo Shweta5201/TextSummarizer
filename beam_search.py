@@ -1,20 +1,4 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
 
-"""This file contains code to run beam search decoding"""
 
 import tensorflow as tf
 import numpy as np
@@ -23,19 +7,10 @@ import data
 FLAGS = tf.app.flags.FLAGS
 
 class Hypothesis(object):
-  """Class to represent a hypothesis during beam search. Holds all the information needed for the hypothesis."""
+
 
   def __init__(self, tokens, log_probs, state, attn_dists, p_gens, coverage):
-    """Hypothesis constructor.
 
-    Args:
-      tokens: List of integers. The ids of the tokens that form the summary so far.
-      log_probs: List, same length as tokens, of floats, giving the log probabilities of the tokens so far.
-      state: Current state of the decoder, a LSTMStateTuple.
-      attn_dists: List, same length as tokens, of numpy arrays with shape (attn_length). These are the attention distributions so far.
-      p_gens: List, same length as tokens, of floats, or None if not using pointer-generator model. The values of the generation probability so far.
-      coverage: Numpy array of shape (attn_length), or None if not using coverage. The current coverage vector.
-    """
     self.tokens = tokens
     self.log_probs = log_probs
     self.state = state
@@ -44,18 +19,7 @@ class Hypothesis(object):
     self.coverage = coverage
 
   def extend(self, token, log_prob, state, attn_dist, p_gen, coverage):
-    """Return a NEW hypothesis, extended with the information from the latest step of beam search.
 
-    Args:
-      token: Integer. Latest token produced by beam search.
-      log_prob: Float. Log prob of the latest token.
-      state: Current decoder state, a LSTMStateTuple.
-      attn_dist: Attention distribution from latest step. Numpy array shape (attn_length).
-      p_gen: Generation probability on latest step. Float.
-      coverage: Latest coverage vector. Numpy array shape (attn_length), or None if not using coverage.
-    Returns:
-      New Hypothesis for next step.
-    """
     return Hypothesis(tokens = self.tokens + [token],
                       log_probs = self.log_probs + [log_prob],
                       state = state,
@@ -79,17 +43,7 @@ class Hypothesis(object):
 
 
 def run_beam_search(sess, model, vocab, batch):
-  """Performs beam search decoding on the given example.
 
-  Args:
-    sess: a tf.Session
-    model: a seq2seq model
-    vocab: Vocabulary object
-    batch: Batch object that is the same example repeated across the batch
-
-  Returns:
-    best_hyp: Hypothesis object; the best hypothesis found by beam search.
-  """
   # Run the encoder to get the encoder hidden states and decoder initial state
   enc_states, dec_in_state = model.run_encoder(sess, batch)
   # dec_in_state is a LSTMStateTuple
@@ -135,7 +89,7 @@ def run_beam_search(sess, model, vocab, batch):
                            coverage=new_coverage_i)
         all_hyps.append(new_hyp)
 
-    # Filter and collect any hypotheses that have produced the end token.
+    
     hyps = [] # will contain hypotheses for the next step
     for h in sort_hyps(all_hyps): # in order of most likely h
       if h.latest_token == vocab.word2id(data.STOP_DECODING): # if stop token is reached...

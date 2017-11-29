@@ -1,20 +1,6 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-# Modifications Copyright 2017 Abigail See
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
 
-"""This file defines the decoder"""
+
+
 
 import tensorflow as tf
 from tensorflow.python.ops import variable_scope
@@ -22,8 +8,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import math_ops
 
-# Note: this function is based on tf.contrib.legacy_seq2seq_attention_decoder, which is now outdated.
-# In the future, it would make more sense to write variants on the attention mechanism using the new seq2seq library for tensorflow 1.0: https://www.tensorflow.org/api_guides/python/contrib.seq2seq#Attention
+
 def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding_mask, cell, initial_state_attention=False, pointer_gen=True, use_coverage=False, prev_coverage=None):
   """
   Args:
@@ -52,21 +37,16 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
     batch_size = encoder_states.get_shape()[0].value # if this line fails, it's because the batch size isn't defined
     attn_size = encoder_states.get_shape()[2].value # if this line fails, it's because the attention length isn't defined
 
-    # Reshape encoder_states (need to insert a dim)
+
     encoder_states = tf.expand_dims(encoder_states, axis=2) # now is shape (batch_size, attn_len, 1, attn_size)
 
-    # To calculate attention, we calculate
-    #   v^T tanh(W_h h_i + W_s s_t + b_attn)
-    # where h_i is an encoder state, and s_t a decoder state.
-    # attn_vec_size is the length of the vectors v, b_attn, (W_h h_i) and (W_s s_t).
-    # We set it to be equal to the size of the encoder states.
+
     attention_vec_size = attn_size
 
-    # Get the weight matrix W_h and apply it to each encoder state to get (W_h h_i), the encoder features
     W_h = variable_scope.get_variable("W_h", [1, 1, attn_size, attention_vec_size])
     encoder_features = nn_ops.conv2d(encoder_states, W_h, [1, 1, 1, 1], "SAME") # shape (batch_size,attn_length,1,attention_vec_size)
 
-    # Get the weight vectors v and w_c (w_c is for coverage)
+
     v = variable_scope.get_variable("v", [attention_vec_size])
     if use_coverage:
       with variable_scope.variable_scope("coverage"):
@@ -77,24 +57,14 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
       prev_coverage = tf.expand_dims(tf.expand_dims(prev_coverage,2),3)
 
     def attention(decoder_state, coverage=None):
-      """Calculate the context vector and attention distribution from the decoder state.
 
-      Args:
-        decoder_state: state of the decoder
-        coverage: Optional. Previous timestep's coverage vector, shape (batch_size, attn_len, 1, 1).
-
-      Returns:
-        context_vector: weighted sum of encoder_states
-        attn_dist: attention distribution
-        coverage: new coverage vector. shape (batch_size, attn_len, 1, 1)
-      """
       with variable_scope.variable_scope("Attention"):
         # Pass the decoder state through a linear layer (this is W_s s_t + b_attn in the paper)
         decoder_features = linear(decoder_state, attention_vec_size, True) # shape (batch_size, attention_vec_size)
         decoder_features = tf.expand_dims(tf.expand_dims(decoder_features, 1), 1) # reshape to (batch_size, 1, 1, attention_vec_size)
 
         def masked_attention(e):
-          """Take softmax of e then apply enc_padding_mask and re-normalize"""
+
           attn_dist = nn_ops.softmax(e) # take softmax. shape (batch_size, attn_length)
           attn_dist *= enc_padding_mask # apply mask
           masked_sums = tf.reduce_sum(attn_dist, axis=1) # shape (batch_size)
@@ -182,22 +152,7 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
 
 
 def linear(args, output_size, bias, bias_start=0.0, scope=None):
-  """Linear map: sum_i(args[i] * W[i]), where W[i] is a variable.
 
-  Args:
-    args: a 2D Tensor or a list of 2D, batch x n, Tensors.
-    output_size: int, second dimension of W[i].
-    bias: boolean, whether to add a bias term or not.
-    bias_start: starting value to initialize the bias; 0 by default.
-    scope: VariableScope for the created subgraph; defaults to "Linear".
-
-  Returns:
-    A 2D Tensor with shape [batch x output_size] equal to
-    sum_i(args[i] * W[i]), where W[i]s are newly created matrices.
-
-  Raises:
-    ValueError: if some of the arguments has unspecified or wrong shape.
-  """
   if args is None or (isinstance(args, (list, tuple)) and not args):
     raise ValueError("`args` must be specified")
   if not isinstance(args, (list, tuple)):
