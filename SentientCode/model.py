@@ -1,9 +1,8 @@
-
 import os
 import time
 import numpy as np
 import tensorflow as tf
-from attention_decoder import attention_decoder
+from decoder_with_attention import attention_decoder
 from tensorflow.contrib.tensorboard.plugins import projector
 
 FLAGS = tf.app.flags.FLAGS
@@ -16,7 +15,7 @@ class SummarizationModel(object):
     self._vocab = vocab
 
   def _add_placeholders(self):
-    """Add placeholders to the graph. These are entry points for any input data."""
+
     hps = self._hps
 
     # encoder part
@@ -37,7 +36,6 @@ class SummarizationModel(object):
 
 
   def _make_feed_dict(self, batch, just_enc=False):
-
     feed_dict = {}
     feed_dict[self._enc_batch] = batch.enc_batch
     feed_dict[self._enc_lens] = batch.enc_lens
@@ -52,7 +50,6 @@ class SummarizationModel(object):
     return feed_dict
 
   def _add_encoder(self, encoder_inputs, seq_len):
-
     with tf.variable_scope('encoder'):
       cell_fw = tf.contrib.rnn.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
       cell_bw = tf.contrib.rnn.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
@@ -62,7 +59,6 @@ class SummarizationModel(object):
 
 
   def _reduce_states(self, fw_st, bw_st):
-
     hidden_dim = self._hps.hidden_dim
     with tf.variable_scope('reduce_final_st'):
 
@@ -81,7 +77,6 @@ class SummarizationModel(object):
 
 
   def _add_decoder(self, inputs):
-
     hps = self._hps
     cell = tf.contrib.rnn.LSTMCell(hps.hidden_dim, state_is_tuple=True, initializer=self.rand_unif_init)
 
@@ -123,7 +118,6 @@ class SummarizationModel(object):
       return final_dists
 
   def _add_emb_vis(self, embedding_var):
-
     train_dir = os.path.join(FLAGS.log_root, "train")
     vocab_metadata_path = os.path.join(train_dir, "vocab_metadata.tsv")
     self._vocab.write_metadata(vocab_metadata_path) # write metadata file
@@ -135,7 +129,6 @@ class SummarizationModel(object):
     projector.visualize_embeddings(summary_writer, config)
 
   def _add_seq2seq(self):
-    """Add the whole sequence-to-sequence model to the graph."""
     hps = self._hps
     vsize = self._vocab.size() # size of the vocabulary
 
@@ -224,7 +217,7 @@ class SummarizationModel(object):
 
 
   def _add_train_op(self):
-    """Sets self._train_op, the op to run for training."""
+
     # Take gradients of the trainable variables w.r.t. the loss function to minimize
     loss_to_minimize = self._total_loss if self._hps.coverage else self._loss
     tvars = tf.trainable_variables()
@@ -283,7 +276,6 @@ class SummarizationModel(object):
     return sess.run(to_return, feed_dict)
 
   def run_encoder(self, sess, batch):
-
     feed_dict = self._make_feed_dict(batch, just_enc=True) # feed the batch into the placeholders
     (enc_states, dec_in_state, global_step) = sess.run([self._enc_states, self._dec_in_state, self.global_step], feed_dict) # run the encoder
 
@@ -294,8 +286,6 @@ class SummarizationModel(object):
 
 
   def decode_onestep(self, sess, batch, latest_tokens, enc_states, dec_init_states, prev_coverage):
-
-
     beam_size = len(dec_init_states)
 
     # Turn dec_init_states (a list of LSTMStateTuples) into a single LSTMStateTuple for the batch
@@ -331,7 +321,7 @@ class SummarizationModel(object):
     results = sess.run(to_return, feed_dict=feed) # run the decoder step
 
     # Convert results['states'] (a single LSTMStateTuple) into a list of LSTMStateTuple -- one for each hypothesis
-    new_states = [tf.contrib.rnn.LSTMStateTuple(results['states'].c[i, :], results['states'].h[i, :]) for i in range(beam_size)]
+    new_states = [tf.contrib.rnn.LSTMStateTuple(results['states'].c[i, :], results['states'].h[i, :]) for i in xrange(beam_size)]
 
     # Convert singleton list containing a tensor to a list of k arrays
     assert len(results['attn_dists'])==1
@@ -342,21 +332,19 @@ class SummarizationModel(object):
       assert len(results['p_gens'])==1
       p_gens = results['p_gens'][0].tolist()
     else:
-      p_gens = [None for _ in range(beam_size)]
+      p_gens = [None for _ in xrange(beam_size)]
 
     # Convert the coverage tensor to a list length k containing the coverage vector for each hypothesis
     if FLAGS.coverage:
       new_coverage = results['coverage'].tolist()
       assert len(new_coverage) == beam_size
     else:
-      new_coverage = [None for _ in range(beam_size)]
+      new_coverage = [None for _ in xrange(beam_size)]
 
     return results['ids'], results['probs'], new_states, attn_dists, p_gens, new_coverage
 
 
 def _mask_and_avg(values, padding_mask):
-
-
   dec_lens = tf.reduce_sum(padding_mask, axis=1) # shape batch_size. float32
   values_per_step = [v * padding_mask[:,dec_step] for dec_step,v in enumerate(values)]
   values_per_ex = sum(values_per_step)/dec_lens # shape (batch_size); normalized value for each batch member
@@ -364,7 +352,6 @@ def _mask_and_avg(values, padding_mask):
 
 
 def _coverage_loss(attn_dists, padding_mask):
- 
   coverage = tf.zeros_like(attn_dists[0]) # shape (batch_size, attn_length). Initial coverage is zero.
   covlosses = [] # Coverage loss per decoder timestep. Will be list length max_dec_steps containing shape (batch_size).
   for a in attn_dists:

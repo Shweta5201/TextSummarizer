@@ -1,34 +1,33 @@
-
 import os
 import time
 import tensorflow as tf
-import beam_search
+import tensor_beamSearch
 import data
 import json
 import pyrouge
-import util
+import utility
 import logging
 import numpy as np
 
 FLAGS = tf.app.flags.FLAGS
 
-SECS_UNTIL_NEW_CKPT = 60  # max number of seconds before loading new checkpoint
+SECS_UNTIL_NEW_CKPT = 60
 
 
 class BeamSearchDecoder(object):
 
-
   def __init__(self, model, batcher, vocab):
-
+    """Initialize decoder.
+    """
     self._model = model
     self._model.build_graph()
     self._batcher = batcher
     self._vocab = vocab
     self._saver = tf.train.Saver() # we use this to load checkpoints for decoding
-    self._sess = tf.Session(config=util.get_config())
+    self._sess = tf.Session(config=utility.get_config())
 
     # Load an initial checkpoint to use for decoding
-    ckpt_path = util.load_ckpt(self._saver, self._sess)
+    ckpt_path = utility.load_ckpt(self._saver, self._sess)
 
     if FLAGS.single_pass:
       # Make a descriptive decode directory name
@@ -52,7 +51,7 @@ class BeamSearchDecoder(object):
 
 
   def decode(self):
-
+    """Decode examples until data is exhausted (if FLAGS.single_pass) and return, or decode indefinitely, loading latest checkpoint at regular intervals"""
     t0 = time.time()
     counter = 0
     while True:
@@ -73,7 +72,7 @@ class BeamSearchDecoder(object):
       abstract_withunks = data.show_abs_oovs(original_abstract, self._vocab, (batch.art_oovs[0] if FLAGS.pointer_gen else None)) # string
 
       # Run beam search to get best Hypothesis
-      best_hyp = beam_search.run_beam_search(self._sess, self._model, self._vocab, batch)
+      best_hyp = tensor_beamSearch.run_beam_search(self._sess, self._model, self._vocab, batch)
 
       # Extract the output ids from the hypothesis and convert back to words
       output_ids = [int(t) for t in best_hyp.tokens[1:]]
@@ -92,18 +91,18 @@ class BeamSearchDecoder(object):
         counter += 1 # this is how many examples we've decoded
       else:
         print_results(article_withunks, abstract_withunks, decoded_output) # log output to screen
-        self.write_for_attnvis(article_withunks, abstract_withunks, decoded_words, best_hyp.attn_dists, best_hyp.p_gens) # write info to .json file for visualization tool
+        #self.write_for_attnvis(article_withunks, abstract_withunks, decoded_words, best_hyp.attn_dists, best_hyp.p_gens) # write info to .json file for visualization tool
 
         # Check if SECS_UNTIL_NEW_CKPT has elapsed; if so return so we can load a new checkpoint
         t1 = time.time()
         if t1-t0 > SECS_UNTIL_NEW_CKPT:
           tf.logging.info('We\'ve been decoding with same checkpoint for %i seconds. Time to load new checkpoint', t1-t0)
-          _ = util.load_ckpt(self._saver, self._sess)
+          _ = utility.load_ckpt(self._saver, self._sess)
           t0 = time.time()
 
   def write_for_rouge(self, reference_sents, decoded_words, ex_index):
-
-    # First, divide decoded output into sentences
+    """Write output to file in correct format for eval with pyrouge. This is called in single_pass mode.
+    # First, divide decoded output into sentences"""
     decoded_sents = []
     while len(decoded_words) > 0:
       try:
@@ -133,42 +132,28 @@ class BeamSearchDecoder(object):
     tf.logging.info("Wrote example %i to file" % ex_index)
 
 
-  def write_for_attnvis(self, article, abstract, decoded_words, attn_dists, p_gens):
-
-    article_lst = article.split() # list of words
-    decoded_lst = decoded_words # list of decoded words
-    to_write = {
-        'article_lst': [make_html_safe(t) for t in article_lst],
-        'decoded_lst': [make_html_safe(t) for t in decoded_lst],
-        'abstract_str': make_html_safe(abstract),
-        'attn_dists': attn_dists
-    }
-    if FLAGS.pointer_gen:
-      to_write['p_gens'] = p_gens
-    output_fname = os.path.join(self._decode_dir, 'attn_vis_data.json')
-    with open(output_fname, 'w') as output_file:
-      json.dump(to_write, output_file)
-    tf.logging.info('Wrote visualization data to %s', output_fname)
-
-
 def print_results(article, abstract, decoded_output):
-
-  print("---------------------------------------------------------------------------")
+  print ""
+  _decode_dir =os.path.join(FLAGS.log_root, "decode")
+  output_fname = os.path.join(_decode_dir, 'Results.txt')
+  with open(output_fname, 'a') as file:
+      file.write('ARTICLE:  '+ article+'\n')
+      file.write('REFERENCE SUMMARY: '+ abstract+'\n') 
+      file.write('GENERATED SUMMARY: '+ decoded_output+'\n')
+      file.write('----------------------------------------------------------------------')
   tf.logging.info('ARTICLE:  %s', article)
   tf.logging.info('REFERENCE SUMMARY: %s', abstract)
-  tf.logging.info('SENTIENT GENERATED SUMMARY: %s', decoded_output)
-  print("---------------------------------------------------------------------------")
+  tf.logging.info('GENERATED SUMMARY: %s', decoded_output)
+  print ""
 
 
 def make_html_safe(s):
-  """Replace any angled brackets in string s to avoid interfering with HTML attention visualizer."""
   s.replace("<", "&lt;")
   s.replace(">", "&gt;")
   return s
 
 
 def rouge_eval(ref_dir, dec_dir):
-  """Evaluate the files in ref_dir and dec_dir with pyrouge, returning results_dict"""
   r = pyrouge.Rouge155()
   r.model_filename_pattern = '#ID#_reference.txt'
   r.system_filename_pattern = '(\d+)_decoded.txt'
@@ -180,7 +165,6 @@ def rouge_eval(ref_dir, dec_dir):
 
 
 def rouge_log(results_dict, dir_to_write):
- 
   log_str = ""
   for x in ["1","2","l"]:
     log_str += "\nROUGE-%s:\n" % x
@@ -199,8 +183,6 @@ def rouge_log(results_dict, dir_to_write):
     f.write(log_str)
 
 def get_decode_dir_name(ckpt_name):
-  """Make a descriptive name for the decode dir, including the name of the checkpoint we use to decode. This is called in single_pass mode."""
-
   if "train" in FLAGS.data_path: dataset = "train"
   elif "val" in FLAGS.data_path: dataset = "val"
   elif "test" in FLAGS.data_path: dataset = "test"

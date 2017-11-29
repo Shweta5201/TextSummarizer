@@ -1,52 +1,28 @@
-
-
-
-
 import tensorflow as tf
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import math_ops
 
-
+# Note: this function is based on tf.contrib.legacy_seq2seq_attention_decoder, which is now outdated.
+# In the future, it would make more sense to write variants on the attention mechanism using the new seq2seq library for tensorflow 1.0: https://www.tensorflow.org/api_guides/python/contrib.seq2seq#Attention
 def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding_mask, cell, initial_state_attention=False, pointer_gen=True, use_coverage=False, prev_coverage=None):
-  """
-  Args:
-    decoder_inputs: A list of 2D Tensors [batch_size x input_size].
-    initial_state: 2D Tensor [batch_size x cell.state_size].
-    encoder_states: 3D Tensor [batch_size x attn_length x attn_size].
-    enc_padding_mask: 2D Tensor [batch_size x attn_length] containing 1s and 0s; indicates which of the encoder locations are padding (0) or a real token (1).
-    cell: rnn_cell.RNNCell defining the cell function and size.
-    initial_state_attention:
-      Note that this attention decoder passes each decoder input through a linear layer with the previous step's context vector to get a modified version of the input. If initial_state_attention is False, on the first decoder step the "previous context vector" is just a zero vector. If initial_state_attention is True, we use initial_state to (re)calculate the previous step's context vector. We set this to False for train/eval mode (because we call attention_decoder once for all decoder steps) and True for decode mode (because we call attention_decoder once for each decoder step).
-    pointer_gen: boolean. If True, calculate the generation probability p_gen for each decoder step.
-    use_coverage: boolean. If True, use coverage mechanism.
-    prev_coverage:
-      If not None, a tensor with shape (batch_size, attn_length). The previous step's coverage vector. This is only not None in decode mode when using coverage.
 
-  Returns:
-    outputs: A list of the same length as decoder_inputs of 2D Tensors of
-      shape [batch_size x cell.output_size]. The output vectors.
-    state: The final state of the decoder. A tensor shape [batch_size x cell.state_size].
-    attn_dists: A list containing tensors of shape (batch_size,attn_length).
-      The attention distributions for each decoder step.
-    p_gens: List of scalars. The values of p_gen for each decoder step. Empty list if pointer_gen=False.
-    coverage: Coverage vector on the last step computed. None if use_coverage=False.
-  """
   with variable_scope.variable_scope("attention_decoder") as scope:
     batch_size = encoder_states.get_shape()[0].value # if this line fails, it's because the batch size isn't defined
     attn_size = encoder_states.get_shape()[2].value # if this line fails, it's because the attention length isn't defined
 
-
+    # Reshape encoder_states (need to insert a dim)
     encoder_states = tf.expand_dims(encoder_states, axis=2) # now is shape (batch_size, attn_len, 1, attn_size)
 
 
     attention_vec_size = attn_size
 
+    # Get the weight matrix W_h and apply it to each encoder state to get (W_h h_i), the encoder features
     W_h = variable_scope.get_variable("W_h", [1, 1, attn_size, attention_vec_size])
     encoder_features = nn_ops.conv2d(encoder_states, W_h, [1, 1, 1, 1], "SAME") # shape (batch_size,attn_length,1,attention_vec_size)
 
-
+    # Get the weight vectors v and w_c (w_c is for coverage)
     v = variable_scope.get_variable("v", [attention_vec_size])
     if use_coverage:
       with variable_scope.variable_scope("coverage"):
@@ -57,7 +33,6 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
       prev_coverage = tf.expand_dims(tf.expand_dims(prev_coverage,2),3)
 
     def attention(decoder_state, coverage=None):
-
       with variable_scope.variable_scope("Attention"):
         # Pass the decoder state through a linear layer (this is W_s s_t + b_attn in the paper)
         decoder_features = linear(decoder_state, attention_vec_size, True) # shape (batch_size, attention_vec_size)
@@ -133,7 +108,7 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
       # Calculate p_gen
       if pointer_gen:
         with tf.variable_scope('calculate_pgen'):
-          p_gen = linear([context_vector, state.c, state.h, x], 1, True) # a scalar
+          p_gen = linear([context_vector, state.c, state.h, x], 1, True) # Tensor shape (batch_size, 1)
           p_gen = tf.sigmoid(p_gen)
           p_gens.append(p_gen)
 
@@ -152,7 +127,6 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
 
 
 def linear(args, output_size, bias, bias_start=0.0, scope=None):
-
   if args is None or (isinstance(args, (list, tuple)) and not args):
     raise ValueError("`args` must be specified")
   if not isinstance(args, (list, tuple)):

@@ -1,6 +1,3 @@
-
-
-
 import glob
 import random
 import struct
@@ -20,10 +17,14 @@ STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untr
 
 
 class Vocab(object):
-
+  """Vocabulary class for mapping between words and ids (integers)"""
 
   def __init__(self, vocab_file, max_size):
+    """Creates a vocab of up to max_size words, reading from the vocab_file. If max_size is 0, reads the entire vocab file.
 
+    Args:
+      vocab_file: path to the vocab file, which is assumed to contain "<word> <frequency>" on each line, sorted with most frequent word first. This code doesn't actually use the frequencies, though.
+      max_size: integer. The maximum size of the resulting Vocabulary."""
     self._word_to_id = {}
     self._id_to_word = {}
     self._count = 0 # keeps track of total number of words in the Vocab
@@ -39,7 +40,7 @@ class Vocab(object):
       for line in vocab_f:
         pieces = line.split()
         if len(pieces) != 2:
-          print('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
+          print 'Warning: incorrectly formatted line in vocabulary file: %s\n' % line
           continue
         w = pieces[0]
         if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
@@ -50,19 +51,19 @@ class Vocab(object):
         self._id_to_word[self._count] = w
         self._count += 1
         if max_size != 0 and self._count >= max_size:
-          print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
+          print "max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count)
           break
 
-    print("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
+    print "Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1])
 
   def word2id(self, word):
-
+    """Returns the id (integer) of a word (string). Returns [UNK] id if word is OOV."""
     if word not in self._word_to_id:
       return self._word_to_id[UNKNOWN_TOKEN]
     return self._word_to_id[word]
 
   def id2word(self, word_id):
-
+    """Returns the word (string) corresponding to an id (integer)."""
     if word_id not in self._id_to_word:
       raise ValueError('Id not found in vocab: %d' % word_id)
     return self._id_to_word[word_id]
@@ -72,12 +73,17 @@ class Vocab(object):
     return self._count
 
   def write_metadata(self, fpath):
+    """Writes metadata file for Tensorboard word embedding visualizer as described here:
+      https://www.tensorflow.org/get_started/embedding_viz
 
-    print("Writing word embedding metadata file to %s..." % (fpath))
+    Args:
+      fpath: place to write the metadata file
+    """
+    print "Writing word embedding metadata file to %s..." % (fpath)
     with open(fpath, "w") as f:
       fieldnames = ['word']
       writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
-      for i in range(self.size()):
+      for i in xrange(self.size()):
         writer.writerow({"word": self._id_to_word[i]})
 
 
@@ -99,12 +105,11 @@ def example_generator(data_path, single_pass):
         example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
         yield example_pb2.Example.FromString(example_str)
     if single_pass:
-      print("example_generator completed reading all datafiles. No more data.")
+      print "example_generator completed reading all datafiles. No more data."
       break
 
 
 def article2ids(article_words, vocab):
-
   ids = []
   oovs = []
   unk_id = vocab.word2id(UNKNOWN_TOKEN)
@@ -121,7 +126,6 @@ def article2ids(article_words, vocab):
 
 
 def abstract2ids(abstract_words, vocab, article_oovs):
-
   ids = []
   unk_id = vocab.word2id(UNKNOWN_TOKEN)
   for w in abstract_words:
@@ -155,7 +159,6 @@ def outputids2words(id_list, vocab, article_oovs):
 
 
 def abstract2sents(abstract):
-
   cur = 0
   sents = []
   while True:
@@ -169,7 +172,6 @@ def abstract2sents(abstract):
 
 
 def show_art_oovs(article, vocab):
-
   unk_token = vocab.word2id(UNKNOWN_TOKEN)
   words = article.split(' ')
   words = [("__%s__" % w) if vocab.word2id(w)==unk_token else w for w in words]
@@ -178,7 +180,7 @@ def show_art_oovs(article, vocab):
 
 
 def show_abs_oovs(abstract, vocab, article_oovs):
-  
+
   unk_token = vocab.word2id(UNKNOWN_TOKEN)
   words = abstract.split(' ')
   new_words = []

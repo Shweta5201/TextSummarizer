@@ -1,7 +1,3 @@
-
-
-"""This is the top-level file to train, evaluate or test your summarization model"""
-
 import sys
 import time
 import os
@@ -12,7 +8,7 @@ from data import Vocab
 from batcher import Batcher
 from model import SummarizationModel
 from decode import BeamSearchDecoder
-import util
+import utility
 from tensorflow.python import debug as tf_debug
 
 FLAGS = tf.app.flags.FLAGS
@@ -61,19 +57,7 @@ tf.app.flags.DEFINE_boolean('debug', False, "Run in tensorflow's debug mode (wat
 
 
 def calc_running_avg_loss(loss, running_avg_loss, summary_writer, step, decay=0.99):
-  """Calculate the running average loss via exponential decay.
-  This is used to implement early stopping w.r.t. a more smooth loss curve than the raw loss curve.
 
-  Args:
-    loss: loss on the most recent eval step
-    running_avg_loss: running_avg_loss so far
-    summary_writer: FileWriter object to write for tensorboard
-    step: training iteration step
-    decay: rate of exponential decay, a float between 0 and 1. Larger is smoother.
-
-  Returns:
-    running_avg_loss: new running average loss
-  """
   if running_avg_loss == 0:  # on the first iteration just take the loss
     running_avg_loss = loss
   else:
@@ -88,56 +72,54 @@ def calc_running_avg_loss(loss, running_avg_loss, summary_writer, step, decay=0.
 
 
 def restore_best_model():
-  """Load bestmodel file from eval directory, add variables for adagrad, and save to train directory"""
   tf.logging.info("Restoring bestmodel for training...")
 
   # Initialize all vars in the model
-  sess = tf.Session(config=util.get_config())
-  print("Initializing all variables...")
+  sess = tf.Session(config=utility.get_config())
+  print "Initializing all variables..."
   sess.run(tf.initialize_all_variables())
 
   # Restore the best model from eval dir
   saver = tf.train.Saver([v for v in tf.all_variables() if "Adagrad" not in v.name])
-  print("Restoring all non-adagrad variables from best model in eval dir...")
-  curr_ckpt = util.load_ckpt(saver, sess, "eval")
-  print ("Restored %s." % curr_ckpt)
+  print "Restoring all non-adagrad variables from best model in eval dir..."
+  curr_ckpt = utility.load_ckpt(saver, sess, "eval")
+  print "Restored %s." % curr_ckpt
 
   # Save this model to train dir and quit
   new_model_name = curr_ckpt.split("/")[-1].replace("bestmodel", "model")
   new_fname = os.path.join(FLAGS.log_root, "train", new_model_name)
-  print ("Saving model to %s..." % (new_fname))
-  new_saver = tf.train.Saver()
+  print "Saving model to %s..." % (new_fname)
+  new_saver = tf.train.Saver() # this saver saves all variables that now exist, including Adagrad variables
   new_saver.save(sess, new_fname)
-  print ("Saved.")
+  print "Saved."
   exit()
 
 
 def convert_to_coverage_model():
-  """Load non-coverage checkpoint, add initialized extra variables for coverage, and save as new checkpoint"""
+
   tf.logging.info("converting non-coverage model to coverage model..")
 
   # initialize an entire coverage model from scratch
-  sess = tf.Session(config=util.get_config())
-  print("initializing everything...")
+  sess = tf.Session(config=utility.get_config())
+  print "initializing everything..."
   sess.run(tf.global_variables_initializer())
 
   # load all non-coverage weights from checkpoint
   saver = tf.train.Saver([v for v in tf.global_variables() if "coverage" not in v.name and "Adagrad" not in v.name])
-  print("restoring non-coverage variables...")
-  curr_ckpt = util.load_ckpt(saver, sess)
-  print("restored.")
+  print "restoring non-coverage variables..."
+  curr_ckpt = utility.load_ckpt(saver, sess)
+  print "restored."
 
   # save this model and quit
   new_fname = curr_ckpt + '_cov_init'
-  print("saving model to %s..." % (new_fname))
+  print "saving model to %s..." % (new_fname)
   new_saver = tf.train.Saver() # this one will save all variables that now exist
   new_saver.save(sess, new_fname)
-  print("saved.")
+  print "saved."
   exit()
 
 
 def setup_training(model, batcher):
-  """Does setup before starting training (run_training)"""
   train_dir = os.path.join(FLAGS.log_root, "train")
   if not os.path.exists(train_dir): os.makedirs(train_dir)
 
@@ -158,7 +140,7 @@ def setup_training(model, batcher):
                      global_step=model.global_step)
   summary_writer = sv.summary_writer
   tf.logging.info("Preparing or waiting for session...")
-  sess_context_manager = sv.prepare_or_wait_for_session(config=util.get_config())
+  sess_context_manager = sv.prepare_or_wait_for_session(config=utility.get_config())
   tf.logging.info("Created session.")
   try:
     run_training(model, batcher, sess_context_manager, sv, summary_writer) # this is an infinite loop until interrupted
@@ -168,7 +150,6 @@ def setup_training(model, batcher):
 
 
 def run_training(model, batcher, sess_context_manager, sv, summary_writer):
-  """Repeatedly runs training iterations, logging loss to screen and writing summaries"""
   tf.logging.info("starting run_training")
   with sess_context_manager as sess:
     if FLAGS.debug: # start the tensorflow debugger
@@ -203,10 +184,9 @@ def run_training(model, batcher, sess_context_manager, sv, summary_writer):
 
 
 def run_eval(model, batcher, vocab):
-  """Repeatedly runs eval iterations, logging to screen and writing summaries. Saves the model with the best loss seen so far."""
   model.build_graph() # build the graph
   saver = tf.train.Saver(max_to_keep=3) # we will keep 3 best checkpoints at a time
-  sess = tf.Session(config=util.get_config())
+  sess = tf.Session(config=utility.get_config())
   eval_dir = os.path.join(FLAGS.log_root, "eval") # make a subdir of the root dir for eval data
   bestmodel_save_path = os.path.join(eval_dir, 'bestmodel') # this is where checkpoints of best models are saved
   summary_writer = tf.summary.FileWriter(eval_dir)
@@ -214,7 +194,7 @@ def run_eval(model, batcher, vocab):
   best_loss = None  # will hold the best loss achieved so far
 
   while True:
-    _ = util.load_ckpt(saver, sess) # load a new checkpoint
+    _ = utility.load_ckpt(saver, sess) # load a new checkpoint
     batch = batcher.next_batch() # get the next batch
 
     # run eval on the batch
@@ -280,7 +260,7 @@ def main(unused_argv):
   # Make a namedtuple hps, containing the values of the hyperparameters that the model needs
   hparam_list = ['mode', 'lr', 'adagrad_init_acc', 'rand_unif_init_mag', 'trunc_norm_init_std', 'max_grad_norm', 'hidden_dim', 'emb_dim', 'batch_size', 'max_dec_steps', 'max_enc_steps', 'coverage', 'cov_loss_wt', 'pointer_gen']
   hps_dict = {}
-  for key,val in FLAGS.__flags.items(): # for each flag
+  for key,val in FLAGS.__flags.iteritems(): # for each flag
     if key in hparam_list: # if it's in the list
       hps_dict[key] = val # add it to the dict
   hps = namedtuple("HParams", hps_dict.keys())(**hps_dict)
@@ -291,7 +271,7 @@ def main(unused_argv):
   tf.set_random_seed(111) # a seed value for randomness
 
   if hps.mode == 'train':
-    print("creating model...")
+    print "creating model..."
     model = SummarizationModel(hps, vocab)
     setup_training(model, batcher)
   elif hps.mode == 'eval':
