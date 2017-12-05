@@ -245,7 +245,7 @@ def main(unused_argv):
     else:
       raise Exception("Logdir %s doesn't exist. Run in train mode to create it." % (FLAGS.log_root))
 
-  vocab = Vocab(FLAGS.vocab_path, FLAGS.vocab_size) # create a vocabulary
+  vocab = Vocab(FLAGS.vocab_path, FLAGS.vocab_size) # create a vocabulary by the files present in the path of size this much words. here 50000
 
   # If in decode mode, set batch_size = beam_size
   # Reason: in decode mode, we decode one example at a time.
@@ -272,7 +272,9 @@ def main(unused_argv):
 
   if hps.mode == 'train':
     print "creating model..."
+    #this new initialization of model model takes parameters or flags and vocab object thats created
     model = SummarizationModel(hps, vocab)
+    #set up the training parameter are model and the batcher
     setup_training(model, batcher)
   elif hps.mode == 'eval':
     model = SummarizationModel(hps, vocab)
