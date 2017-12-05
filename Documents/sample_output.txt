@@ -1,0 +1,370 @@
+Article (truncated): andy murray came close to giving himself some extra preparation time for
+his wedding next week before ensuring that he still has unfinished tennis business to attend to .
+the world no 4 is into the semi-finals of the miami open , but not before getting a scare from
+21 year-old austrian dominic thiem , who pushed him to 4-4 in the second set before going
+down 3-6 6-4 , 6-1 in an hour and three quarters . murray was awaiting the winner from the
+last eight match between tomas berdych and argentina ’s juan monaco . prior to this tournament
+thiem lost in the second round of a challenger event to soon-to-be new brit aljaz bedene . andy
+murray pumps his first after defeating dominic thiem to reach the miami open semi finals .
+muray throws his sweatband into the crowd after completing a 3-6 , 6-4 , 6-1 victory in florida
+. murray shakes hands with thiem who he described as a ’ strong guy ’ after the game . and
+murray has a fairly simple message for any of his fellow british tennis players who might be
+agitated about his imminent arrival into the home ranks : do n’t complain . instead the british no
+1 believes his colleagues should use the assimilation of the world number 83 , originally from
+slovenia , as motivation to better themselves .
+
+
+Reference Summary:
+british no 1 defeated dominic thiem in miami open quarter finals .
+andy murray celebrated his 500th career win in the previous round .
+third seed will play the winner of tomas berdych and juan monaco in the semi finals of the atp masters
+1000 event in key biscayne .
+
+
+Baseline:
+andy murray beat UNK bedene 6-3 , 6-4 , 6-1 in an hour and three quarters .
+british no 1 believes his colleagues should use the maze of the world number 83 , originally from
+slovenia , as motivation to better themselves .
+
+
+Pointer-Generator, No Coverage:
+andy murray came close to giving himself some extra preparation for his wedding next week before
+getting a scare from 21 year-old austrian dominic thiem .
+the world no 4 is into the semi-finals of the miami open , but not before getting a scare from 21 year-old
+austrian dominic thiem .
+
+
+Pointer-Generator, With Coverage:
+andy murray defeated dominic thiem 3-6 6-4 , 6-1 in an hour and three quarters .
+murray was awaiting the winner from the last eight match between tomas berdych and argentina
+’s juan monaco .
+prior to this tournament thiem lost in the second round of a challenger event to soon-to-be new
+brit aljaz bedene .
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+Article (truncated): munster have signed new zealand international francis saili on a two-year
+deal . utility back saili , who made his all blacks debut against argentina in 2013 , will move
+to the province later this year after the completion of his 2015 contractual commitments . the
+24-year-old currently plays for auckland-based super rugby side the blues and was part of the
+new zealand under-20 side that won the junior world championship in italy in 2011 . saili ’s
+signature is something of a coup for munster and head coach anthony foley believes he will
+be a great addition to their backline . francis saili has signed a two-year deal to join munster
+and will link up with them later this year . ’ we are really pleased that francis has committed
+his future to the province , ’ foley told munster ’s official website . ’ he is a talented centre
+with an impressive skill-set and he possesses the physical attributes to excel in the northern
+hemisphere . ’ i believe he will be a great addition to our backline and we look forward to
+welcoming him to munster . ’ saili has been capped twice by new zealand and was part of the
+under 20 side that won the junior championship in 2011 .
+
+
+
+Reference Summary:
+utility back francis saili will join up with munster later this year .
+the new zealand international has signed a two-year contract .
+saili made his debut for the all blacks against argentina in 2013 .
+
+
+
+
+Baseline:
+dutch international francis UNK has signed a two-year deal to join irish UNK super rugby side the
+blues .
+UNK ’s signature is something of a coup for munster and his head coach anthony foley believes he will
+be a great addition to their respective prospects .
+UNK has been capped twice by new zealand .
+
+
+Pointer-Generator, No Coverage:
+new zealand international francis saili will move to the province later this year .
+utility back saili made his all blacks debut against argentina in 2013 .
+utility back saili will move to the province later this year .
+
+
+
+Pointer-Generator, With Coverage:
+francis saili has signed a two-year deal to join munster later this year .
+the 24-year-old was part of the new zealand under-20 side that won the junior world
+championship in italy in 2011 .
+saili ’s signature is something of a coup for munster and head coach anthony foley .
+
+
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+
+
+Article (truncated): right from the moment he breezed through the doors at old trafford , louis
+van gaal was a man with a plan . the first season , he stated , would see him deliver manchester
+united back into their rightful place in the champions league . he would restore them to the
+premier league top four but loftier aims of silverware would have to wait . his three-year vision
+would allow for such thoughts but , first things first , united needed to be dining from european
+football ’s top table again . louis van gaal is close to delivering his first-season aim of returning
+man united into champions league . wayne rooney smashes home during manchester united ’s
+3-1 win over aston villa on saturday . united ’s win over aston villa took them third , eight
+points ahead of fifth-placed liverpool in the table . april 12 manchester city ( h ) . april 18
+chelsea ( a ) . april 26 everton ( a ) . may 2 west bromwich albion ( h ) . may 9 crystal
+palace ( a ) . may 17 arsenal ( h ) . may 24 hull city ( a ) . one season out of the champions
+league was far from ideal , but two seasons would be an absolute disaster and something , he
+understood , that would not be tolerated . in november , even that was looking optimistic . a
+1-0 defeat to manchester city meant that united had taken just 13 points from their opening 10
+matches - it was their worst start to a league campaign since 1986 , when ron atkinson only
+lasted until november .
+
+
+
+
+Reference Summary:
+man united have an eight-point cushion from fifth-place liverpool .
+van gaal looks likely to deliver on his promise of top four finish .
+but the dutchman has a three-year vision mapped out .
+next season will have to see united mount sustained challenge for title .
+they must also reach the later stages of the champions league .
+
+
+
+Baseline:
+manchester united beat aston villa 3-1 at old trafford on saturday .
+louis van gaal is close to delivering his UNK aim of returning man united into the premier league top
+four .
+louis van gaal is close to delivering his UNK aim of returning man united into champions league .
+
+
+Pointer-Generator, No Coverage:
+louis van gaal is close to delivering his first-season aim of returning man united into champions league.
+united ’s win over aston villa took them third , eight points ahead of fifth-placed liverpool in the table .
+louis van gaal is close to delivering his first-season aim of returning man united into champions league.
+
+
+
+Pointer-Generator, With Coverage:
+manchester united beat aston villa 3-1 at old trafford on saturday .
+louis van gaal is close to delivering his first-season aim of returning man united into champions
+league .
+united needed to be dining from european football ’s top table again .
+
+
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+
+Article (truncated): having been on the receiving end of a 6-1 thumping , a defeat like that
+could be justifiably met with a backlash by angry supporters . watching a 3-1 first leg aggregate
+advantage turn into a 7-4 deficit come the end of the reverse encounter too could send many
+fans apoplectic at the capitulation of their side . however that does n’t appear the case for
+those devoted to porto . porto supporters gave their team a hero ’s welcome following their
+6-1 defeat at bayern munich on tuesday . porto star striker jackson martinez was one of many
+players to look perplexed by their warm reception . porto boss julen lopetegui ( left ) was
+hugged by fans congratulating him on their champions league run . police escorts were needed
+to keep the delirious supporters at bay as the porto team bus drove past . the team bus was met
+with a cacophony of noise from porto supporters proudly chanting about their club . on their
+return from a humiliating champions league quarter-final loss at the hands of bayern munich on
+tuesday night , the squad were given a heroes reception as they arrived back in portugal . in the
+early hours of wednesday morning , fans mobbed the squad congratulating them on their run
+in the tournament . star striker jackson martinez and ricardo quaresma were one of many porto
+players who looked perplexed as they were hugged by fans before they making their way on to
+the team bus - set upon a cacophony of fiercely-proud chanting . it was the first time that porto
+, who had been unbeaten in this season ’s tournament up until tuesday night , had reached the
+quarter-finals of the champions league since the 2008-09 season .
+
+
+
+
+Reference Summary:
+bayern munich beat porto 6-1 in their champions league tie on tuesday .
+result saw bayern win quarter-final encounter 7-4 on aggregate .
+it was the first-time porto had reached that stage since the 2008-09 season .
+
+
+
+Baseline:
+porto beat bayern munich 2-0 in the champions league on tuesday night .
+porto star james UNK was one of many players involved in the match .
+the squad were given a trophy as they arrived back in portugal .
+
+
+Pointer-Generator, No Coverage:
+porto star striker jackson martinez was one of many players to look perplexed by their warm reception.
+porto star striker jackson martinez was one of many players to look perplexed by their warm reception.
+porto star striker jackson martinez was one of many players to look perplexed by their warm reception.
+
+
+Pointer-Generator, With Coverage:
+porto star striker jackson martinez was one of many players to look perplexed by their warm
+reception .
+porto boss julen lopetegui was hugged by fans congratulating him on their champions league
+run .
+however that does n’t appear the case for those devoted to porto .
+police escorts were needed to keep the delirious supporters at bay .
+
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+
+Article: ( cnn ) ” it ’s showtime ! ” michael keaton paid homage – ever so slightly – to
+his roles in “ beetlejuice ” and “ batman ” in his third turn hosting “ saturday night live ”
+this weekend . keaton acknowledged in his opening monologue that a lot has changed since
+he first hosted the comedy sketch show in 1982 . “ i had a baby – he ’s 31 . i also have
+a new girlfriend – she ’s 28 , ” he said . fans who were hoping for a full-blown revival of
+keaton ’s most memorable characters might have been a little disappointed . snl cast members
+taran killam and bobby moynihan begged the actor with a song to “ play ” batman and
+beetlejuice with them . all they got in response were a couple of one-liners . overall , keaton
+’s performance drew high marks from viewers and critics for its “ deadpan ” manner and “
+unpredictable weirdness , ” in the words of a.v . club ’s dennis perkins . fans also delighted
+in a cameo from “ walking dead ” star norman reedus during weekend update . keaton scored
+some laughs from the audience as an ad executive who ’s not very good at his job , a confused
+grandfather and a high school teacher who gets asked to the prom in a riff on the romantic
+comedy “ she ’s all that . ” other crowd-pleasing spots included a scientology parody music
+video and a news conference spoofing the ncaa student-athlete debate . the show also poked fun
+at cnn with cast member cecily strong playing anchor brooke baldwin . baldwin said on twitter
+that she ’s taking it as a “ crazy compliment ” and shared a clip from the skit .
+
+
+
+Reference Summary:
+michael keaton hosted “ saturday night live ” for the first time in 1982 .
+in 2015 , his nods to starring roles in “ beetlejuice ” and “ batman ” are brief
+
+
+
+Baseline:
+“ snl ” wins “ saturday night live ” .
+keaton acknowledged in his opening “ saturday night live ” .
+keaton acknowledged in his opening night ’s “ UNK ” .
+the show also pokes fun at cnn with cast member mariah carey .
+
+
+Pointer-Generator, No Coverage:
+“ beetlejuice ” michael keaton paid homage to his roles in “ beetlejuice ” and “ batman ” in his third
+turn hosting “ saturday night live ” this weekend .
+keaton acknowledged in his opening monologue that a lot has changed since he first hosted the comedy
+sketch show in 1982 .
+
+
+
+Pointer-Generator, With Coverage:
+michael keaton paid homage to his roles in “ beetlejuice ” and “ batman ” in his third turn
+hosting “ saturday night live ” .
+keaton acknowledged in his opening monologue that a lot has changed since he first hosted the
+comedy sketch show in 1982 .
+
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+Article (truncated): they are supposed to be the dream team who can solve the conundrum
+of how to win the election . but david cameron and boris johnson were left scratching their
+heads today as they struggled with a children ’s jigsaw teaching toddlers about the seasons
+. as the london mayor tried to hammer ill-fitting pieces together with his hands , the prime
+minister tried out what could be a new election slogan , telling him : ’ if in doubt , wedge it
+in . ’ after being put right by a four-year-old who spotted their errors , the pair had more fun
+finger painting with tory blue paint . david cameron and boris johnson were left stumped by
+the puzzle at advantage children ’s day nursery in surbiton , as three-year-old stephanie looked
+on . when they tried to put the puzzle back together , they hit trouble after it proved to be
+more difficult than expected . the conservative duo made their first appearance together on the
+campaign trail with a visit to advantage day nursery in surbiton , south west london . they were
+supposed to be highlighting tory plans to double free childcare for 600,000 children aged three
+and four . they sat at a table with joshua and stephanie , both aged three , and four-year-olds
+hamish and leo where they broke up a puzzle which depicted the four seasons . when they tried
+to put it back together , they hit trouble after it proved to be more difficult than expected .
+
+
+
+Reference Summary:
+david cameron and boris johnson visit nursery to promote childcare .
+duo left flummoxed by jigsaw aimed at teaching children about seasons .
+london mayor resorted to brute force to hammer wrong pieces together .
+prime minister gave his approval , telling boris : ’ if in doubt , wedge it in ’ .
+
+
+
+Baseline:
+david cameron and boris johnson were left mystified by the puzzle .
+they were at the nursery in UNK to promote a tory pledge to double free childcare for 25 children aged
+three and four .
+the pair were at the nursery in UNK to promote a tory pledge to double free childcare for children aged
+three and four .
+
+
+Pointer-Generator, No Coverage:
+london mayor tried to hammer ill-fitting pieces together with his hands .
+they were supposed to be highlighting tory plans to double free childcare .
+they were supposed to be highlighting tory plans to double free childcare .
+they were supposed to be highlighting tory plans to double free childcare .
+
+
+Pointer-Generator, With Coverage:
+london mayor tried to hammer ill-fitting pieces together with his hands .
+prime minister tried out what could be a new election slogan .
+but they hit trouble after it proved to be more difficult than expected .
+
+
+__________________________________________________________________________________________________________________________
+
+
+
+Article: cairo ( cnn ) at least 12 people were killed sunday , and more injured , in separate
+attacks on a police station , a checkpoint and along a highway in egypt ’s northern sinai ,
+authorities said . six people , including one civilian , were killed when a car bomb exploded
+near the police station in al-arish , capital of north sinai , health ministry spokesman hossam
+abdel-ghafar told ahram online . he said 40 people were injured . ansar beit al-maqdis , an isis
+affiliate , claimed responsibility for the attack , which came hours after another operation that
+the group also claimed . in that earlier attack , a first lieutenant , a sergeant and four conscripts
+were killed when their armored vehicle was attacked on the highway from al-arish to sheikh
+zuweid in northern sinai , the military said . two other soldiers were injured and taken to a
+military hospital . ansar beit al-maqdis has claimed many attacks against the army and police
+in sinai . a third attack sunday on a checkpoint in rafah left three security personnel injured
+, after unknown assailants opened fire at them , according to state media . the attacks come
+as the military announced a reshuffle of several senior military positions , state media reported
+. among those being replaced are the generals in charge of military intelligence and egypt ’s
+second field army , which is spearheading the battle against the insurgents in the northern sinai
+. egypt ’s army has been fighting a decade-long militant islamist insurgency , which has spiked
+since the ouster of muslim brotherhood president mohamed morsy in the summer of 2013 .
+hundreds of police and soldiers , as well as civilians , have been killed in militant attacks in
+the past months . ian lee reported from cairo . anas hamdan reported from atlanta .
+
+
+
+Reference Summary:
+six people , including one civilian , are killed when a car bomb explodes near a police station .
+six others are killed when their armored vehicle is attacked on a highway in northern sinai .
+ansar beit al-maqdis , an isis affiliate , claims responsibility .
+
+
+
+Baseline:
+he says the attacks come after another operation that killed 12 .
+the attacks come as military announced a u.n. peacekeeping force in northern sinai .
+
+
+Pointer-Generator, No Coverage:
+ansar beit al-maqdis , an isis affiliate , claimed responsibility for the attack .
+ansar beit al-maqdis , an isis affiliate , claimed responsibility for the attack .
+the attacks come as the military announced a reshuffle of several senior military positions .
+
+
+Pointer-Generator, With Coverage:
+six people , including one civilian , were killed when a car bomb explodes near the police
+station .
+ansar beit al-maqdis , an isis affiliate , claimed responsibility for the attack .
+egypt ’s army has been fighting a decade-long militant islamist insurgency .
+
+
+__________________________________________________________________________________________________________________________
+
+
+

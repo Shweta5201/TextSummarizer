@@ -136,7 +136,7 @@ class SummarizationModel(object):
       # Some initializers
       self.rand_unif_init = tf.random_uniform_initializer(-hps.rand_unif_init_mag, hps.rand_unif_init_mag, seed=123)
       self.trunc_norm_init = tf.truncated_normal_initializer(stddev=hps.trunc_norm_init_std)
-
+#-----------------------------------------------------------embeddings----------------------------------------------------------------------------------------------
       # Add embedding matrix (shared by the encoder and decoder inputs)
       with tf.variable_scope('embedding'):
         embedding = tf.get_variable('embedding', [vsize, hps.emb_dim], dtype=tf.float32, initializer=self.trunc_norm_init)
@@ -144,6 +144,8 @@ class SummarizationModel(object):
         emb_enc_inputs = tf.nn.embedding_lookup(embedding, self._enc_batch) # tensor with shape (batch_size, max_enc_steps, emb_size)
         emb_dec_inputs = [tf.nn.embedding_lookup(embedding, x) for x in tf.unstack(self._dec_batch, axis=1)] # list length max_dec_steps containing shape (batch_size, emb_size)
 
+
+#-------------------------------------------------------the declaration of encoder and decoder----------------------------------------------------------------------
       # Add the encoder.
       enc_outputs, fw_st, bw_st = self._add_encoder(emb_enc_inputs, self._enc_lens)
       self._enc_states = enc_outputs
@@ -242,7 +244,7 @@ class SummarizationModel(object):
     t0 = time.time()
     self._add_placeholders()
     with tf.device("/gpu:0"):
-      self._add_seq2seq()
+      self._add_seq2seq()#adding sequence to sequence model
     self.global_step = tf.Variable(0, name='global_step', trainable=False)
     if self._hps.mode == 'train':
       self._add_train_op()
