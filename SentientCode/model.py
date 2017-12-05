@@ -238,7 +238,7 @@ class SummarizationModel(object):
 
   def build_graph(self):
     """Add the placeholders, model, global step, train_op and summaries to the graph"""
-    tf.logging.info('Building graph...')
+    tf.logging.info('Building graph(the main model for training)...')
     t0 = time.time()
     self._add_placeholders()
     with tf.device("/gpu:0"):
@@ -250,8 +250,10 @@ class SummarizationModel(object):
     t1 = time.time()
     tf.logging.info('Time to build graph: %i seconds', t1 - t0)
 
+# entry point from training ______________________________________________________________________________________________________________________
   def run_train_step(self, sess, batch):
     """Runs one training iteration. Returns a dictionary containing train op, summaries, loss, global_step and (optionally) coverage loss."""
+    #_make_feed_dict takes a batch
     feed_dict = self._make_feed_dict(batch)
     to_return = {
         'train_op': self._train_op,
@@ -260,7 +262,7 @@ class SummarizationModel(object):
         'global_step': self.global_step,
     }
     if self._hps.coverage:
-      to_return['coverage_loss'] = self._coverage_loss
+      to_return['coverage_loss'] = self._coverage_loss#returns coverage loss when needed
     return sess.run(to_return, feed_dict)
 
   def run_eval_step(self, sess, batch):

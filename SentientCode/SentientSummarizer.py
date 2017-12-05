@@ -123,6 +123,8 @@ def setup_training(model, batcher):
   train_dir = os.path.join(FLAGS.log_root, "train")
   if not os.path.exists(train_dir): os.makedirs(train_dir)
 
+
+#here the actual model graph is built. code in model
   model.build_graph() # build the graph
   if FLAGS.convert_to_coverage_model:
     assert FLAGS.coverage, "To convert your non-coverage model to a coverage model, run with convert_to_coverage_model=True and coverage=True"
@@ -130,7 +132,7 @@ def setup_training(model, batcher):
   if FLAGS.restore_best_model:
     restore_best_model()
   saver = tf.train.Saver(max_to_keep=3) # keep 3 checkpoints at a time
-
+#my supervisor will save the model while training. for crash recovery
   sv = tf.train.Supervisor(logdir=train_dir,
                      is_chief=True,
                      saver=saver,
@@ -143,7 +145,7 @@ def setup_training(model, batcher):
   sess_context_manager = sv.prepare_or_wait_for_session(config=utility.get_config())
   tf.logging.info("Created session.")
   try:
-    run_training(model, batcher, sess_context_manager, sv, summary_writer) # this is an infinite loop until interrupted
+    run_training(model, batcher, sess_context_manager, sv, summary_writer) # this is an infinite loop until interrupted main training code
   except KeyboardInterrupt:
     tf.logging.info("Caught keyboard interrupt on worker. Stopping supervisor...")
     sv.stop()
@@ -160,7 +162,8 @@ def run_training(model, batcher, sess_context_manager, sv, summary_writer):
 
       tf.logging.info('running training step...')
       t0=time.time()
-      results = model.run_train_step(sess, batch)
+      #__________________________________________________________________________________________________________________________________________
+      results = model.run_train_step(sess, batch)#main training steps that happens in model
       t1=time.time()
       tf.logging.info('seconds for training step: %.3f', t1-t0)
 
@@ -170,6 +173,7 @@ def run_training(model, batcher, sess_context_manager, sv, summary_writer):
       if not np.isfinite(loss):
         raise Exception("Loss is not finite. Stopping.")
 
+#only for coverage mechanism
       if FLAGS.coverage:
         coverage_loss = results['coverage_loss']
         tf.logging.info("coverage_loss: %f", coverage_loss) # print the coverage loss to screen

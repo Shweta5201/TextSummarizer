@@ -104,7 +104,7 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
       else:
         context_vector, attn_dist, coverage = attention(state, coverage)
       attn_dists.append(attn_dist)
-
+#__________________________________________________________________calculation for p gen _________________________________________________________________________
       # Calculate p_gen
       if pointer_gen:
         with tf.variable_scope('calculate_pgen'):
