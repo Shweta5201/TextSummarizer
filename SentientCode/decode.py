@@ -7,6 +7,8 @@ import json
 import pyrouge
 import utility
 import logging
+import psycopg2
+import sqlite3
 import numpy as np
 
 FLAGS = tf.app.flags.FLAGS
@@ -25,7 +27,17 @@ class BeamSearchDecoder(object):
     self._vocab = vocab
     self._saver = tf.train.Saver() # we use this to load checkpoints for decoding
     self._sess = tf.Session(config=utility.get_config())
-
+    '''self.conn=psycopg2.connect("dbname='Database1' user='postgres' password='postgres123' host='localhost' port='5432'")
+    curr = self.conn.cursor()
+    cur.execute("DELETE IF EXISTS FROM SUMMARY")
+    curr.execute("CREATE TABLE IF NOT EXISTS SUMMARY(actual_text text, reference_summary text, summary text)")
+    self.conn.commit()
+    self.conn.close()'''  
+    conn = sqlite3.connect("./Frontend/db/Summaries.db")
+    curr = conn.cursor()
+    curr.execute("CREATE TABLE IF NOT EXISTS SUMMARY(actual_text text, reference_summary text, summary text)")
+    conn.commit()
+    conn.close()
     # Load an initial checkpoint to use for decoding
     ckpt_path = utility.load_ckpt(self._saver, self._sess)
 
@@ -138,9 +150,11 @@ def print_results(article, abstract, decoded_output):
   output_fname = os.path.join(_decode_dir, 'Results.txt')
   with open(output_fname, 'a') as file:
       file.write('ARTICLE:  '+ article+'\n')
-      file.write('REFERENCE SUMMARY: '+ abstract+'\n') 
+      file.write('REFERENCE SUMMARY: '+ abstract+'\n')
       file.write('GENERATED SUMMARY: '+ decoded_output+'\n')
       file.write('----------------------------------------------------------------------')
+
+  insert_into(article,abstract,decoded_output)
   tf.logging.info('ARTICLE:  %s', article)
   tf.logging.info('REFERENCE SUMMARY: %s', abstract)
   tf.logging.info('GENERATED SUMMARY: %s', decoded_output)
@@ -191,3 +205,14 @@ def get_decode_dir_name(ckpt_name):
   if ckpt_name is not None:
     dirname += "_%s" % ckpt_name
   return dirname
+
+
+def insert_into(actual_text, reference_summary , summary):
+    #conn=psycopg2.connect("dbname='Database1' user='postgres' password='postgres123' host='localhost' port='5432'")
+    conn = sqlite3.connect("./Frontend/db/Summaries.db")
+    conn.text_factory = str
+    curr=conn.cursor()
+ #   curr.execute("INSERT INTO SUMMARY VALUES(%s,%s,%s)", (actual_text, reference_summary , summary))
+    curr.execute("INSERT INTO SUMMARY VALUES(?,?,?)", (actual_text, reference_summary, summary))
+    conn.commit()
+    conn.close()

@@ -1,0 +1,118 @@
+@import "_config.scss";
+
+header {
+  position: relative;
+  display: block;
+  width: 100%;
+  background: $black;
+  color: $white;
+  height: 60px;
+
+  .logo{
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    @include translateY(-50% );
+  }
+
+  nav,
+  nav ul,
+  nav ul li{
+    margin: 0;
+    padding: 0;
+    color:$white;
+  }
+
+  nav{
+    position: absolute;
+    top: 50%;
+
+    @include translateY(-50% );
+
+    ul li{
+      list-style-type: none;
+      display: inline-block;
+      margin-right: 20px;
+      color:$white;
+    }
+
+    &.last{
+      margin: 0;
+    }
+
+    a {
+      font-size: 19px;
+      line-height: normal;
+      color: $white;
+    }
+  }
+
+
+}
+
+
+
+.project-headings{
+  text-align: center;
+  width: 100%;
+  height: 100px;
+
+}
+
+section{
+  width: 100%;
+
+  .container{
+    .project-headings{
+      margin: 10px;
+    }
+
+    .row{
+
+      .col-lg-4{
+
+        .expertise-block{
+
+          padding: 10px;
+        }
+      }
+    }
+  }
+
+  .home-page{
+
+    .container {
+    width:100%;
+    height: 100%;
+    text-align: center;
+    color: black;
+    background-image: url("../../Assets/images/background.jpg");
+    background-size: contain;
+    background-position: center;
+    background-attachment: fixed;
+
+    project-headings{
+
+
+      intro-slate{
+        background-color: red;
+      }
+    }
+
+    .intro-text{
+      font-size: 20px;
+    }
+
+
+    }
+
+    .img-responsive{
+      display: block;
+      margin: 5% auto 3%;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+    }
+  }
+}
