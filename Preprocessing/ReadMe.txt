@@ -9,4 +9,3 @@ python make_datafiles.py /path/to/cnn/stories
 
 output generated:
   cnn_stories_tokenized , train.bin, val.bin, test.bin this will be placed in finished file. A vocab file is built from the training data and is placed in finished files.
-
