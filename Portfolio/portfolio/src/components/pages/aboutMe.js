@@ -8,15 +8,6 @@ class AboutMe extends Component {
     this.state={
       newsData:{}};
 
-  this.data = [{
-    title: 'Happy bday',
-    desc: 'I am soggy'
-  },
-  {
-    title: 'Die Today',
-    desc: 'I am gay'
-  }];
-
   fetch(newsUrl).then(d => d.json())
   .then(d => {
     this.setState({
